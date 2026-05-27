@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management System | May 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2a5298;
+        }
+
+        .search-bar {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0 30px 30px 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: #2a5298;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .stock-qty {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .stock-low {
+            color: #e74c3c;
+        }
+
+        .stock-medium {
+            color: #f39c12;
+        }
+
+        .stock-good {
+            color: #27ae60;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-minus {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-minus:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .btn-plus {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-plus:hover {
+            background: #219a52;
+            transform: scale(1.05);
+        }
+
+        .qty-input {
+            width: 70px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .qty-input:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .action-row {
+            background: #fff3cd;
+        }
+
+        .action-row td {
+            padding: 8px 12px;
+        }
+
+        .btn-update {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-update:hover {
+            background: #2980b9;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .export-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 20px;
+        }
+
+        .export-btn:hover {
+            background: #219a52;
+        }
+
+        .reset-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .reset-btn:hover {
+            background: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .stats-bar {
+                flex-direction: column;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            td, th {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 PAT&CHLOE INVENTORY MANAGEMENT SYSTEM</h1>
+            <p>Real-time Stock Tracking with Minus/Plus Functionality</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <h3>Total Products</h3>
+                <div class="number" id="totalProducts">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Units in Stock</h3>
+                <div class="number" id="totalUnits">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Low Stock Items (≤5)</h3>
+                <div class="number" id="lowStockCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Out of Stock</h3>
+                <div class="number" id="outOfStockCount">0</div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Search products...">
+        </div>
+
+        <div class="table-wrapper">
+            <table id="inventoryTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>Current Stock</th>
+                        <th>Status</th>
+                        <th>Minus Qty</th>
+                        <th>Plus Qty</th>
+                        <th>Actions</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Initial inventory data from your screenshot
+        let inventory = [
+            { id: 1, name: "Jar - Caffee Decaf", stock: 36 },
+            { id: 2, name: "Jar - Caffee Macchiato", stock: 63 },
+            { id: 3, name: "Jar - Caffee Black", stock: 15 },
+            { id: 4, name: "Jar - Matcha Detox", stock: 20 },
+            { id: 5, name: "Jar - Avocado", stock: 20 },
+            { id: 6, name: "Jar - Cantaloupe Melon", stock: 31 },
+            { id: 7, name: "Jar - Lychee", stock: 23 },
+            { id: 8, name: "Jar - Dark Choco", stock: 32 },
+            { id: 9, name: "Jar - 4Seasons", stock: 37 },
+            { id: 10, name: "Jar - Cucumber & Dalandan", stock: 22 },
+            { id: 11, name: "Jar - Blueberry", stock: 17 },
+            { id: 12, name: "Jar - Turmeric", stock: 5 },
+            { id: 13, name: "Box - Promeal Taro", stock: 0 },
+            { id: 14, name: "Box - Turmeric", stock: 11 },
+            { id: 15, name: "Pouch - Caffee Decaf", stock: 29 },
+            { id: 16, name: "Pouch - Caffee Macchiato", stock: 100 },
+            { id: 17, name: "Pouch - Caffee Black", stock: 30 },
+            { id: 18, name: "Pouch - Matcha Detox", stock: 36 },
+            { id: 19, name: "Pouch - Avocado", stock: 43 },
+            { id: 20, name: "Pouch - Cantaloupe Melon", stock: 18 },
+            { id: 21, name: "Pouch - Lychee", stock: 0 },
+            { id: 22, name: "Pouch - Dark Choco", stock: 38 },
+            { id: 23, name: "Pouch - 4Seasons", stock: 31 },
+            { id: 24, name: "Pouch - Cucumber & Dalandan", stock: 29 },
+            { id: 25, name: "Pouch - Blueberry", stock: 34 },
+            { id: 26, name: "Kilo - Macchiato", stock: 2 },
+            { id: 27, name: "Ecran", stock: 0 },
+            { id: 28, name: "Konjac Sauce", stock: 0 },
+            { id: 29, name: "Konjac Zero Shirataki Rice 1kilo", stock: 2 },
+            { id: 30, name: "Konjac Zero Shirataki 500g", stock: 11 },
+            { id: 31, name: "Beauty Talks", stock: 11 },
+            { id: 32, name: "Booster C", stock: 8 },
+            { id: 33, name: "Tinted Sunscreen", stock: 19 },
+            { id: 34, name: "Kilo - Decaf Macchiato", stock: 2 },
+            { id: 35, name: "Anna e", stock: 10 }
+        ];
+
+        let tempMinus = {};
+        let tempPlus = {};
+
+        // Initialize temp values
+        inventory.forEach(item => {
+            tempMinus[item.id] = 0;
+            tempPlus[item.id] = 0;
+        });
+
+        // Helper functions
+        function getStockStatus(stock) {
+            if (stock <= 0) return { text: "OUT OF STOCK", class: "stock-low" };
+            if (stock <= 5) return { text: "CRITICAL LOW", class: "stock-low" };
+            if (stock <= 15) return { text: "LOW STOCK", class: "stock-medium" };
+            return { text: "GOOD", class: "stock-good" };
+        }
+
+        function formatDate() {
+            return new Date().toLocaleString();
+        }
+
+        // Update stock with minus/plus
+        function updateStock(id) {
+            const item = inventory.find(i => i.id === id);
+            if (!item) return;
+
+            const minusQty = parseInt(tempMinus[id]) || 0;
+            const plusQty = parseInt(tempPlus[id]) || 0;
+
+            if (minusQty > item.stock) {
+                alert(`Cannot deduct ${minusQty} units from "${item.name}". Only ${item.stock} units available!`);
+                tempMinus[id] = 0;
+                document.getElementById(`minus_${id}`).value = 0;
+                return;
+            }
+
+            if (minusQty === 0 && plusQty === 0) {
+                alert("Please enter a quantity to minus or plus.");
+                return;
+            }
+
+            const newStock = item.stock - minusQty + plusQty;
+            item.stock = newStock;
+            item.lastUpdated = formatDate();
+
+            // Reset temp values
+            tempMinus[id] = 0;
+            tempPlus[id] = 0;
+            document.getElementById(`minus_${id}`).value = 0;
+            document.getElementById(`plus_${id}`).value = 0;
+
+            // Refresh display
+            renderTable();
+            updateStats();
+
+            // Show success message
+            const actionType = minusQty > 0 ? `removed ${minusQty} unit(s)` : `added ${plusQty} unit(s)`;
+            alert(`✓ Updated "${item.name}": ${actionType}. New stock: ${newStock}`);
+        }
+
+        // Quick minus function (no confirmation, direct deduction)
+        function quickMinus(id, amount) {
+            const item = inventory.find(i => i.id === id);
+            if (item.stock >= amount) {
+                item.stock -= amount;
+                item.lastUpdated = formatDate();
+                renderTable();
+                updateStats();
+                alert(`✓ Removed ${amount} unit(s) from "${item.name}". New stock: ${item.stock}`);
+            } else {
+                alert(`Cannot remove ${amount} unit(s) from "${item.name}". Only ${item.stock} available!`);
+            }
+        }
+
+        // Quick plus function
+        function quickPlus(id, amount) {
+            const item = inventory.find(i => i.id === id);
+            item.stock += amount;
+            item.lastUpdated = formatDate();
+            renderTable();
+            updateStats();
+            alert(`✓ Added ${amount} unit(s) to "${item.name}". New stock: ${item.stock}`);
+        }
+
+        function updateStats() {
+            const totalProducts = inventory.length;
+            const totalUnits = inventory.reduce((sum, item) => sum + item.stock, 0);
+            const lowStockCount = inventory.filter(item => item.stock > 0 && item.stock <= 5).length;
+            const outOfStockCount = inventory.filter(item => item.stock === 0).length;
+
+            document.getElementById('totalProducts').textContent = totalProducts;
+            document.getElementById('totalUnits').textContent = totalUnits;
+            document.getElementById('lowStockCount').textContent = lowStockCount;
+            document.getElementById('outOfStockCount').textContent = outOfStockCount;
+        }
+
+        function renderTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = inventory.filter(item => 
+                item.name.toLowerCase().includes(searchTerm)
+            );
+
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            filtered.forEach((item, index) => {
+                const status = getStockStatus(item.stock);
+                const row = tbody.insertRow();
+
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td class="product-name">${item.name}</td>
+                    <td class="stock-qty ${status.class}">${item.stock}</td>
+                    <td><span style="background: ${status.class === 'stock-low' ? '#fee' : status.class === 'stock-medium' ? '#fff3cd' : '#d4edda'}; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">${status.text}</span></td>
+                    <td><input type="number" id="minus_${item.id}" class="qty-input" min="0" value="0" onchange="tempMinus[${item.id}] = parseInt(this.value) || 0"></td>
+                    <td><input type="number" id="plus_${item.id}" class="qty-input" min="0" value="0" onchange="tempPlus[${item.id}] = parseInt(this.value) || 0"></td>
+                    <td class="action-buttons">
+                        <button class="btn-minus" onclick="quickMinus(${item.id}, 1)">-1</button>
+                        <button class="btn-minus" onclick="quickMinus(${item.id}, 5)">-5</button>
+                        <button class="btn-plus" onclick="quickPlus(${item.id}, 1)">+1</button>
+                        <button class="btn-plus" onclick="quickPlus(${item.id}, 5)">+5</button>
+                        <button class="btn-update" onclick="updateStock(${item.id})">Apply</button>
+                    </td>
+                    <td class="timestamp">${item.lastUpdated || 'Not updated yet'}</td>
+                `;
+
+                // Set input values
+                const minusInput = document.getElementById(`minus_${item.id}`);
+                const plusInput = document.getElementById(`plus_${item.id}`);
+                if (minusInput) minusInput.value = tempMinus[item.id] || 0;
+                if (plusInput) plusInput.value = tempPlus[item.id] || 0;
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', () => {
+            renderTable();
+        });
+
+        // Export to CSV
+        function exportToCSV() {
+            let csv = "Product Name,Current Stock,Status,Last Updated\n";
+            inventory.forEach(item => {
+                const status = getStockStatus(item.stock).text;
+                csv += `"${item.name}",${item.stock},"${status}","${item.lastUpdated || 'N/A'}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventory_export_${new Date().toISOString().slice(0,19)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Add export button to header
+        const headerDiv = document.querySelector('.stats-bar');
+        const buttonDiv = document.createElement('div');
+        buttonDiv.style.display = 'flex';
+        buttonDiv.style.gap = '10px';
+        buttonDiv.style.alignItems = 'center';
+        buttonDiv.innerHTML = `
+            <button class="export-btn" onclick="exportToCSV()">📎 Export to CSV</button>
+            <button class="reset-btn" onclick="location.reload()">⟳ Reset to Original</button>
+        `;
+        headerDiv.appendChild(buttonDiv);
+
+        // Initial render
+        renderTable();
+        updateStats();
+    </script>
+</body>
+</html>
