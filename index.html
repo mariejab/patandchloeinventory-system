@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Management System | May 2026</title>
+    <title>PAT&CHLOE Inventory Management System</title>
     <link rel="icon" type="image/x-icon" href="favicon.png">
     <style>
         * {
@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #efc288 0%, #eeb996 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -29,19 +29,19 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 25px 30px;
+            background: linear-gradient(135deg, #74d9e2 0%, #f5b781 100%);
+            color: rgb(255, 255, 255);
+            padding: 20px 30px;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 26px;
             margin-bottom: 5px;
         }
 
         .header p {
             opacity: 0.9;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .stats-bar {
@@ -70,7 +70,7 @@
         .stat-card .number {
             font-size: 28px;
             font-weight: bold;
-            color: #2a5298;
+            color: #98502a;
         }
 
         .search-bar {
@@ -105,7 +105,7 @@
         }
 
         th {
-            background: #2a5298;
+            background: #05847f;
             color: white;
             padding: 12px;
             text-align: left;
@@ -265,14 +265,26 @@
                 font-size: 12px;
                 padding: 8px;
             }
+            .header h1 {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- HEADER WITH LOGO ON LEFT SIDE -->
         <div class="header">
-            <h1>📦 PAT&CHLOE INVENTORY MANAGEMENT SYSTEM</h1>
-            <p>Real-time Stock Tracking with Minus/Plus Functionality</p>
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <!-- LOGO IMAGE (favicon.png) -->
+                    <img src="favicon.png" alt="PAT&CHLOE Logo" style="height: 60px; width: auto; border-radius: 15px; background: white; padding: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    <div>
+                        <h1>PAT&CHLOE INVENTORY MANAGEMENT SYSTEM</h1>
+                        <p>Real-time Stock Tracking with Minus/Plus Functionality</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="stats-bar">
