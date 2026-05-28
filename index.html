@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAT&CHLOE Inventory Management System</title>
+    <title>PAT&CHLOE Inventory Management System - Live Sync</title>
     <link rel="icon" type="image/x-icon" href="favicon1.png">
     <style>
         * {
@@ -44,6 +44,24 @@
             font-size: 13px;
         }
 
+        .live-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-left: 15px;
+            vertical-align: middle;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
         .stats-bar {
             display: flex;
             gap: 20px;
@@ -77,7 +95,6 @@
             color: transparent;
         }
 
-        /* ENHANCED SEARCH BAR */
         .search-section {
             padding: 20px 30px;
             background: white;
@@ -148,7 +165,6 @@
             border-radius: 20px;
         }
 
-        /* ENHANCED ACTION BUTTONS (Export & Reset) */
         .action-toolbar {
             display: flex;
             justify-content: flex-end;
@@ -197,7 +213,6 @@
             transform: translateY(0);
         }
 
-        /* Toast notification */
         .toast-notification {
             position: fixed;
             bottom: 30px;
@@ -349,7 +364,6 @@
             min-width: 100px;
         }
 
-        /* Footer styling */
         .footer-note {
             text-align: center;
             padding: 16px;
@@ -387,14 +401,15 @@
 </head>
 <body>
     <div class="container">
-        <!-- HEADER WITH LOGO ON LEFT SIDE -->
         <div class="header">
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <img src="favicon1.png" alt="PAT&CHLOE Logo" style="height: 60px; width: auto; border-radius: 15px; background: white; padding: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                     <div>
-                        <h1>PAT&CHLOE INVENTORY MANAGEMENT SYSTEM</h1>
-                        <p>Real-time Stock Tracking with Minus/Plus Functionality</p>
+                        <h1>PAT&CHLOE INVENTORY MANAGEMENT SYSTEM 
+                            <span class="live-badge">🔴 LIVE SYNC</span>
+                        </h1>
+                        <p>Real-time Stock Tracking - Changes sync across ALL users instantly</p>
                     </div>
                 </div>
             </div>
@@ -419,7 +434,6 @@
             </div>
         </div>
 
-        <!-- ENHANCED SEARCH SECTION -->
         <div class="search-section">
             <div class="search-wrapper">
                 <span class="search-icon">🔍</span>
@@ -432,7 +446,6 @@
             </div>
         </div>
 
-        <!-- ENHANCED ACTION TOOLBAR (Export & Reset) -->
         <div class="action-toolbar">
             <button class="action-btn export-btn" id="exportBtn">📎 Export to CSV</button>
             <button class="action-btn reset-btn" id="resetBtn">⟳ Reset to Original</button>
@@ -457,17 +470,36 @@
             </table>
         </div>
 
-        <!-- FOOTER ADDED HERE -->
         <div class="footer-note">
             PAT&CHLOE · Beauty and Wellness Products Shop
         </div>
     </div>
 
-    <!-- Toast notification -->
     <div id="toastMsg" class="toast-notification"></div>
 
+    <!-- Firebase SDK (using compat version for easier integration) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <script>
-        // Initial inventory data (master copy for reset functionality)
+        // ========== YOUR FIREBASE CONFIGURATION ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0LX-tgqohpJHZyoHmpmCh7-qfBYx-kXk",
+            authDomain: "pat-chloe-inventory.firebaseapp.com",
+            projectId: "pat-chloe-inventory",
+            storageBucket: "pat-chloe-inventory.firebasestorage.app",
+            messagingSenderId: "163010057354",
+            appId: "1:163010057354:web:ead356b829b43017db8973",
+            measurementId: "G-D1TBEXY67V"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // ========== END FIREBASE CONFIG ==========
+
+        // Master inventory data
         const MASTER_INVENTORY = [
             { id: 1, name: "Jar - Caffee Decaf", stock: 36 },
             { id: 2, name: "Jar - Caffee Macchiato", stock: 63 },
@@ -506,59 +538,11 @@
             { id: 35, name: "Anna e", stock: 10 }
         ];
 
-        // ========== PERSISTENCE FUNCTIONS (NEW) ==========
-        
-        // Save inventory to localStorage
-        function saveInventoryToLocalStorage() {
-            localStorage.setItem('patChloeInventory', JSON.stringify(inventory));
-            console.log('Inventory saved to localStorage');
-        }
-        
-        // Load inventory from localStorage
-        function loadInventoryFromLocalStorage() {
-            const saved = localStorage.getItem('patChloeInventory');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        console.log('Loaded saved inventory from localStorage');
-                        return parsed;
-                    }
-                } catch(e) {
-                    console.error('Error loading saved inventory:', e);
-                }
-            }
-            console.log('No saved inventory found, using master inventory');
-            return null;
-        }
-        
-        // Reset to original (and clear localStorage)
-        function resetToOriginalAndClearStorage() {
-            if (confirm('⚠️ Are you sure you want to reset ALL inventory to original May stocks?\nThis will undo all changes made.')) {
-                inventory = MASTER_INVENTORY.map(item => ({ ...item, lastUpdated: null }));
-                saveInventoryToLocalStorage(); // Save the reset state
-                initTemp();
-                renderTable();
-                updateStats();
-                showToast('✓ Inventory has been reset to original May stocks');
-            }
-        }
-        
-        // ========== END PERSISTENCE FUNCTIONS ==========
-
         let inventory = [];
         let tempMinus = {};
         let tempPlus = {};
+        let isUpdatingFromFirebase = false;
 
-        // Initialize temp values
-        function initTemp() {
-            inventory.forEach(item => {
-                tempMinus[item.id] = 0;
-                tempPlus[item.id] = 0;
-            });
-        }
-
-        // Show toast message
         function showToast(message, isError = false) {
             const toast = document.getElementById('toastMsg');
             toast.textContent = message;
@@ -569,7 +553,6 @@
             }, 2500);
         }
 
-        // Get stock status
         function getStockStatus(stock) {
             if (stock <= 0) return { text: "OUT OF STOCK", class: "stock-low" };
             if (stock <= 5) return { text: "CRITICAL LOW", class: "stock-low" };
@@ -581,7 +564,26 @@
             return new Date().toLocaleString();
         }
 
-        // Update stock (MODIFIED to save after update)
+        // Save to Firebase
+        function saveToFirebase() {
+            if (isUpdatingFromFirebase) return;
+            
+            const dataToSave = {};
+            inventory.forEach(item => {
+                dataToSave[item.id] = {
+                    id: item.id,
+                    name: item.name,
+                    stock: item.stock,
+                    lastUpdated: item.lastUpdated || null
+                };
+            });
+            
+            database.ref('inventory').set(dataToSave).catch(error => {
+                console.error('Firebase save error:', error);
+                showToast('Error saving to cloud', true);
+            });
+        }
+
         function updateStock(id) {
             const item = inventory.find(i => i.id === id);
             if (!item) return;
@@ -608,7 +610,7 @@
 
             renderTable();
             updateStats();
-            saveInventoryToLocalStorage(); // SAVE AFTER UPDATE
+            saveToFirebase();
             showToast(`✓ "${item.name}" updated. New stock: ${newStock}`);
         }
 
@@ -619,7 +621,7 @@
                 item.lastUpdated = formatDate();
                 renderTable();
                 updateStats();
-                saveInventoryToLocalStorage(); // SAVE AFTER CHANGE
+                saveToFirebase();
                 showToast(`✓ Removed ${amount} from "${item.name}". New stock: ${item.stock}`);
             } else {
                 showToast(`Cannot remove ${amount} from "${item.name}". Only ${item.stock} left!`, true);
@@ -632,7 +634,7 @@
             item.lastUpdated = formatDate();
             renderTable();
             updateStats();
-            saveInventoryToLocalStorage(); // SAVE AFTER CHANGE
+            saveToFirebase();
             showToast(`✓ Added ${amount} to "${item.name}". New stock: ${item.stock}`);
         }
 
@@ -648,7 +650,6 @@
             document.getElementById('outOfStockCount').textContent = outOfStockCount;
         }
 
-        // ENHANCED SEARCH with result count and clear functionality
         function updateSearchInfo(filteredCount, totalCount, searchTerm) {
             const searchInfo = document.getElementById('searchInfo');
             const resultCountSpan = document.getElementById('searchResultCount');
@@ -682,8 +683,7 @@
 
             filtered.forEach((item, index) => {
                 const status = getStockStatus(item.stock);
-                const row = tbody.insertRow();
-
+                
                 let statusBg = '';
                 let statusColor = '';
                 if (status.text === "OUT OF STOCK") {
@@ -700,6 +700,7 @@
                     statusColor = '#1A6B6F';
                 }
 
+                const row = tbody.insertRow();
                 row.innerHTML = `
                     <td style="font-weight: 500;">${index + 1}</td>
                     <td class="product-name">${escapeHtml(item.name)}</td>
@@ -739,12 +740,26 @@
             });
         }
 
-        // ENHANCED RESET with confirmation (MODIFIED to use new reset function)
         function resetToOriginal() {
-            resetToOriginalAndClearStorage();
+            if (confirm('⚠️ Are you sure you want to reset ALL inventory to original stocks?\nThis will undo all changes made by ALL users!')) {
+                const resetInventory = {};
+                MASTER_INVENTORY.forEach(item => {
+                    resetInventory[item.id] = {
+                        id: item.id,
+                        name: item.name,
+                        stock: item.stock,
+                        lastUpdated: null
+                    };
+                });
+                
+                database.ref('inventory').set(resetInventory).then(() => {
+                    showToast('✓ Inventory has been reset to original stocks');
+                }).catch(error => {
+                    showToast('Error resetting inventory', true);
+                });
+            }
         }
 
-        // ENHANCED EXPORT with formatted CSV and success message
         function exportToCSV() {
             const now = new Date();
             const dateStr = now.toISOString().slice(0, 19).replace(/:/g, '-');
@@ -777,18 +792,69 @@
             showToast(`✓ Exported ${inventory.length} products to CSV`);
         }
 
-        // ========== INITIALIZATION (MODIFIED to load saved data) ==========
-        
-        // Load inventory from localStorage or use master
-        const savedInventory = loadInventoryFromLocalStorage();
-        if (savedInventory) {
-            inventory = savedInventory;
-        } else {
-            inventory = MASTER_INVENTORY.map(item => ({ ...item, lastUpdated: null }));
+        // Listen for real-time updates from Firebase
+        function listenForInventoryUpdates() {
+            const inventoryRef = database.ref('inventory');
+            
+            inventoryRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data) {
+                    isUpdatingFromFirebase = true;
+                    
+                    // Convert Firebase object back to array
+                    const newInventory = Object.values(data);
+                    newInventory.sort((a, b) => a.id - b.id);
+                    
+                    inventory = newInventory;
+                    tempMinus = {};
+                    tempPlus = {};
+                    inventory.forEach(item => {
+                        tempMinus[item.id] = 0;
+                        tempPlus[item.id] = 0;
+                    });
+                    
+                    renderTable();
+                    updateStats();
+                    isUpdatingFromFirebase = false;
+                    
+                    console.log('🔄 Real-time update received from Firebase');
+                }
+            }, (error) => {
+                console.error('Firebase listen error:', error);
+                showToast('Connection error - check your internet', true);
+            });
         }
-        
-        // Initialize temp values
-        initTemp();
+
+        // Initialize the app
+        function initializeApp() {
+            const inventoryRef = database.ref('inventory');
+            
+            inventoryRef.once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    // First time - upload master inventory to Firebase
+                    console.log('First time setup - uploading master inventory to Firebase');
+                    const initialData = {};
+                    MASTER_INVENTORY.forEach(item => {
+                        initialData[item.id] = {
+                            id: item.id,
+                            name: item.name,
+                            stock: item.stock,
+                            lastUpdated: null
+                        };
+                    });
+                    inventoryRef.set(initialData).then(() => {
+                        console.log('✅ Master inventory uploaded to Firebase');
+                        showToast('🟢 Connected to cloud - Live sync enabled', false);
+                    });
+                } else {
+                    showToast('🟢 Connected to cloud - Live sync enabled', false);
+                }
+            });
+            
+            // Start listening for real-time updates
+            listenForInventoryUpdates();
+        }
 
         // Event listeners
         document.getElementById('searchInput').addEventListener('input', renderTable);
@@ -797,15 +863,8 @@
         document.getElementById('exportBtn').addEventListener('click', exportToCSV);
         document.getElementById('resetBtn').addEventListener('click', resetToOriginal);
 
-        // Initial render
-        renderTable();
-        updateStats();
-        
-        // Optional: Show a welcome toast indicating if data was loaded from storage
-        if (savedInventory) {
-            console.log('Previous inventory data loaded successfully');
-            showToast('📦 Previous inventory data loaded', false);
-        }
+        // Start the app
+        initializeApp();
     </script>
 </body>
 </html>
