@@ -467,7 +467,7 @@
     <div id="toastMsg" class="toast-notification"></div>
 
     <script>
-        // Initial inventory data
+        // Initial inventory data (master copy for reset functionality)
         const MASTER_INVENTORY = [
             { id: 1, name: "Jar - Caffee Decaf", stock: 36 },
             { id: 2, name: "Jar - Caffee Macchiato", stock: 63 },
@@ -506,7 +506,47 @@
             { id: 35, name: "Anna e", stock: 10 }
         ];
 
-        let inventory = MASTER_INVENTORY.map(item => ({ ...item, lastUpdated: null }));
+        // ========== PERSISTENCE FUNCTIONS (NEW) ==========
+        
+        // Save inventory to localStorage
+        function saveInventoryToLocalStorage() {
+            localStorage.setItem('patChloeInventory', JSON.stringify(inventory));
+            console.log('Inventory saved to localStorage');
+        }
+        
+        // Load inventory from localStorage
+        function loadInventoryFromLocalStorage() {
+            const saved = localStorage.getItem('patChloeInventory');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        console.log('Loaded saved inventory from localStorage');
+                        return parsed;
+                    }
+                } catch(e) {
+                    console.error('Error loading saved inventory:', e);
+                }
+            }
+            console.log('No saved inventory found, using master inventory');
+            return null;
+        }
+        
+        // Reset to original (and clear localStorage)
+        function resetToOriginalAndClearStorage() {
+            if (confirm('⚠️ Are you sure you want to reset ALL inventory to original May stocks?\nThis will undo all changes made.')) {
+                inventory = MASTER_INVENTORY.map(item => ({ ...item, lastUpdated: null }));
+                saveInventoryToLocalStorage(); // Save the reset state
+                initTemp();
+                renderTable();
+                updateStats();
+                showToast('✓ Inventory has been reset to original May stocks');
+            }
+        }
+        
+        // ========== END PERSISTENCE FUNCTIONS ==========
+
+        let inventory = [];
         let tempMinus = {};
         let tempPlus = {};
 
@@ -517,7 +557,6 @@
                 tempPlus[item.id] = 0;
             });
         }
-        initTemp();
 
         // Show toast message
         function showToast(message, isError = false) {
@@ -542,7 +581,7 @@
             return new Date().toLocaleString();
         }
 
-        // Update stock
+        // Update stock (MODIFIED to save after update)
         function updateStock(id) {
             const item = inventory.find(i => i.id === id);
             if (!item) return;
@@ -569,6 +608,7 @@
 
             renderTable();
             updateStats();
+            saveInventoryToLocalStorage(); // SAVE AFTER UPDATE
             showToast(`✓ "${item.name}" updated. New stock: ${newStock}`);
         }
 
@@ -579,6 +619,7 @@
                 item.lastUpdated = formatDate();
                 renderTable();
                 updateStats();
+                saveInventoryToLocalStorage(); // SAVE AFTER CHANGE
                 showToast(`✓ Removed ${amount} from "${item.name}". New stock: ${item.stock}`);
             } else {
                 showToast(`Cannot remove ${amount} from "${item.name}". Only ${item.stock} left!`, true);
@@ -591,6 +632,7 @@
             item.lastUpdated = formatDate();
             renderTable();
             updateStats();
+            saveInventoryToLocalStorage(); // SAVE AFTER CHANGE
             showToast(`✓ Added ${amount} to "${item.name}". New stock: ${item.stock}`);
         }
 
@@ -697,17 +739,9 @@
             });
         }
 
-        // ENHANCED RESET with confirmation
+        // ENHANCED RESET with confirmation (MODIFIED to use new reset function)
         function resetToOriginal() {
-            if (confirm('⚠️ Are you sure you want to reset ALL inventory to original May stocks?\nThis will undo all changes made.')) {
-                inventory = MASTER_INVENTORY.map(item => ({ ...item, lastUpdated: null }));
-                tempMinus = {};
-                tempPlus = {};
-                initTemp();
-                renderTable();
-                updateStats();
-                showToast('✓ Inventory has been reset to original May stocks');
-            }
+            resetToOriginalAndClearStorage();
         }
 
         // ENHANCED EXPORT with formatted CSV and success message
@@ -743,6 +777,19 @@
             showToast(`✓ Exported ${inventory.length} products to CSV`);
         }
 
+        // ========== INITIALIZATION (MODIFIED to load saved data) ==========
+        
+        // Load inventory from localStorage or use master
+        const savedInventory = loadInventoryFromLocalStorage();
+        if (savedInventory) {
+            inventory = savedInventory;
+        } else {
+            inventory = MASTER_INVENTORY.map(item => ({ ...item, lastUpdated: null }));
+        }
+        
+        // Initialize temp values
+        initTemp();
+
         // Event listeners
         document.getElementById('searchInput').addEventListener('input', renderTable);
         document.getElementById('clearSearchBtn').addEventListener('click', clearSearch);
@@ -753,6 +800,12 @@
         // Initial render
         renderTable();
         updateStats();
+        
+        // Optional: Show a welcome toast indicating if data was loaded from storage
+        if (savedInventory) {
+            console.log('Previous inventory data loaded successfully');
+            showToast('📦 Previous inventory data loaded', false);
+        }
     </script>
 </body>
 </html>
