@@ -1,870 +1,978 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAT&CHLOE Inventory Management System - Live Sync</title>
-    <link rel="icon" type="image/x-icon" href="favicon1.png">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAT&CHLOE · add product</title>
+  <link rel="icon" type="image/x-icon" href="favicon1.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #FEF5E6 0%, #FFF0E0 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #FEF5E6 0%, #FFF0E0 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
 
-        .header {
-            background: linear-gradient(135deg, #0B3B3F 0%, #1A6B6F 100%);
-            color: rgb(255, 255, 255);
-            padding: 20px 30px;
-        }
+    .header {
+      background: linear-gradient(135deg, #0B3B3F 0%, #1A6B6F 100%);
+      color: white;
+      padding: 20px 30px;
+    }
 
-        .header h1 {
-            font-size: 26px;
-            margin-bottom: 5px;
-        }
+    .header h1 {
+      font-size: 26px;
+      margin-bottom: 5px;
+    }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 13px;
-        }
+    .header p {
+      opacity: 0.9;
+      font-size: 13px;
+    }
 
-        .live-badge {
-            display: inline-block;
-            background: #4CAF50;
-            color: white;
-            font-size: 11px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-left: 15px;
-            vertical-align: middle;
-            animation: pulse 2s infinite;
-        }
+    .live-badge {
+      display: inline-block;
+      background: #4CAF50;
+      color: white;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-left: 15px;
+      vertical-align: middle;
+      animation: pulse 2s infinite;
+    }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
 
-        .stats-bar {
-            display: flex;
-            gap: 20px;
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-        }
+    .stats-bar {
+      display: flex;
+      gap: 20px;
+      padding: 20px 30px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+    }
 
-        .stat-card {
-            flex: 1;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-align: center;
-            border-top: 3px solid #D9A13B;
-        }
+    .stat-card {
+      flex: 1;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+      border-top: 3px solid #D9A13B;
+    }
 
-        .stat-card h3 {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
-        }
+    .stat-card h3 {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+    }
 
-        .stat-card .number {
-            font-size: 28px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #D9A13B, #1A6B6F);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
+    .stat-card .number {
+      font-size: 28px;
+      font-weight: bold;
+      background: linear-gradient(135deg, #D9A13B, #1A6B6F);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
 
-        .search-section {
-            padding: 20px 30px;
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-        }
+    .search-section {
+      padding: 20px 30px;
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+    }
 
-        .search-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
 
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            font-size: 18px;
-            color: #1A6B6F;
-            pointer-events: none;
-        }
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      font-size: 18px;
+      color: #1A6B6F;
+      pointer-events: none;
+    }
 
-        .search-bar {
-            width: 100%;
-            padding: 14px 20px 14px 45px;
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
-            font-size: 14px;
-            transition: all 0.3s;
-            background: #fefefe;
-        }
+    .search-bar {
+      width: 100%;
+      padding: 14px 20px 14px 45px;
+      border: 2px solid #e0e0e0;
+      border-radius: 50px;
+      font-size: 14px;
+      transition: all 0.3s;
+      background: #fefefe;
+    }
 
-        .search-bar:focus {
-            outline: none;
-            border-color: #D9A13B;
-            box-shadow: 0 0 0 3px rgba(217, 161, 59, 0.2);
-        }
+    .search-bar:focus {
+      outline: none;
+      border-color: #D9A13B;
+      box-shadow: 0 0 0 3px rgba(217, 161, 59, 0.2);
+    }
 
-        .search-clear {
-            position: absolute;
-            right: 15px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            color: #999;
-            display: none;
-            padding: 5px;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
+    .search-clear {
+      position: absolute;
+      right: 15px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: #999;
+      display: none;
+      padding: 5px;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
 
-        .search-clear:hover {
-            color: #E27C2C;
-            background: #f0f0f0;
-        }
+    .search-clear:hover {
+      color: #E27C2C;
+      background: #f0f0f0;
+    }
 
-        .search-info {
-            margin-top: 8px;
-            font-size: 12px;
-            color: #1A6B6F;
-            display: none;
-            align-items: center;
-            gap: 10px;
-        }
+    .search-info {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #1A6B6F;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .search-info span {
-            background: #E6F4F0;
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
+    .search-info span {
+      background: #E6F4F0;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
 
-        .action-toolbar {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            padding: 15px 30px;
-            background: #fafafa;
-            border-bottom: 1px solid #e0e0e0;
-        }
+    .action-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 15px 30px;
+      background: #fafafa;
+      border-bottom: 1px solid #e0e0e0;
+      flex-wrap: wrap;
+    }
 
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 24px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-        }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+      border: none;
+    }
 
-        .export-btn {
-            background: #289F9F;
-            color: white;
-        }
+    .export-btn {
+      background: #289F9F;
+      color: white;
+    }
 
-        .export-btn:hover {
-            background: #1D7F7F;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(40, 159, 159, 0.3);
-        }
+    .export-btn:hover {
+      background: #1D7F7F;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(40, 159, 159, 0.3);
+    }
 
-        .reset-btn {
-            background: #F0A54B;
-            color: white;
-        }
+    .reset-btn {
+      background: #F0A54B;
+      color: white;
+    }
 
-        .reset-btn:hover {
-            background: #DD8F3A;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(240, 165, 75, 0.3);
-        }
+    .reset-btn:hover {
+      background: #DD8F3A;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(240, 165, 75, 0.3);
+    }
 
-        .action-btn:active {
-            transform: translateY(0);
-        }
+    .add-btn {
+      background: #1A6B6F;
+      color: white;
+    }
 
-        .toast-notification {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1A6B6F;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
+    .add-btn:hover {
+      background: #0B4B4F;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(26, 107, 111, 0.3);
+    }
 
-        .table-wrapper {
-            overflow-x: auto;
-            padding: 0 30px 30px 30px;
-        }
+    .action-btn:active {
+      transform: translateY(0);
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
+    .toast-notification {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #1A6B6F;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
 
-        th {
-            background: #1A6B6F;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            position: sticky;
-            top: 0;
-            font-weight: 600;
-        }
+    .table-wrapper {
+      overflow-x: auto;
+      padding: 0 30px 30px 30px;
+    }
 
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
 
-        tr:hover {
-            background: #f5f5f5;
-        }
+    th {
+      background: #1A6B6F;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      font-weight: 600;
+    }
 
-        .product-name {
-            font-weight: 500;
-            color: #333;
-        }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
 
-        .stock-qty {
-            font-weight: bold;
-            font-size: 16px;
-        }
+    tr:hover {
+      background: #f5f5f5;
+    }
 
-        .stock-low {
-            color: #E27C2C;
-        }
+    .product-name {
+      font-weight: 500;
+      color: #333;
+    }
 
-        .stock-medium {
-            color: #D98E2B;
-        }
+    .stock-qty {
+      font-weight: bold;
+      font-size: 16px;
+    }
 
-        .stock-good {
-            color: #1A6B6F;
-        }
+    .stock-low {
+      color: #E27C2C;
+    }
 
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+    .stock-medium {
+      color: #D98E2B;
+    }
 
-        .btn-minus {
-            background: #F0A54B;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
+    .stock-good {
+      color: #1A6B6F;
+    }
 
-        .btn-minus:hover {
-            background: #DD8F3A;
-            transform: scale(1.05);
-        }
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-        .btn-plus {
-            background: #289F9F;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
+    .btn-minus {
+      background: #F0A54B;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
 
-        .btn-plus:hover {
-            background: #1D7F7F;
-            transform: scale(1.05);
-        }
+    .btn-minus:hover {
+      background: #DD8F3A;
+      transform: scale(1.05);
+    }
 
-        .qty-input {
-            width: 70px;
-            padding: 6px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 12px;
-        }
+    .btn-plus {
+      background: #289F9F;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
 
-        .qty-input:focus {
-            outline: none;
-            border-color: #D9A13B;
-        }
+    .btn-plus:hover {
+      background: #1D7F7F;
+      transform: scale(1.05);
+    }
 
-        .btn-update {
-            background: #987001;
-            color: white;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
+    .qty-input {
+      width: 70px;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 12px;
+    }
 
-        .btn-update:hover {
-            background: #C28C2E;
-        }
+    .qty-input:focus {
+      outline: none;
+      border-color: #D9A13B;
+    }
 
-        .timestamp {
-            font-size: 11px;
-            color: #999;
-        }
+    .btn-update {
+      background: #987001;
+      color: white;
+      border: none;
+      padding: 6px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+    }
 
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            white-space: nowrap;
-            text-align: center;
-            min-width: 100px;
-        }
+    .btn-update:hover {
+      background: #C28C2E;
+    }
 
-        .footer-note {
-            text-align: center;
-            padding: 16px;
-            font-size: 11px;
-            font-family: 'Segoe UI', 'Inter', sans-serif;
-            color: #B48C6C;
-            border-top: 1px solid #F0E4D8;
-            background: white;
-            letter-spacing: 0.3px;
-        }
+    .timestamp {
+      font-size: 11px;
+      color: #999;
+    }
 
-        @media (max-width: 768px) {
-            .stats-bar {
-                flex-direction: column;
-            }
-            .action-buttons {
-                flex-direction: column;
-            }
-            td, th {
-                font-size: 12px;
-                padding: 8px;
-            }
-            .header h1 {
-                font-size: 18px;
-            }
-            .action-toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .action-btn {
-                justify-content: center;
-            }
-        }
-    </style>
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .footer-note {
+      text-align: center;
+      padding: 16px;
+      font-size: 11px;
+      font-family: 'Segoe UI', 'Inter', sans-serif;
+      color: #B48C6C;
+      border-top: 1px solid #F0E4D8;
+      background: white;
+      letter-spacing: 0.3px;
+    }
+
+    /* add product modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: white;
+      max-width: 460px;
+      width: 90%;
+      padding: 30px 28px;
+      border-radius: 28px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      animation: modalFade 0.25s ease;
+    }
+
+    @keyframes modalFade {
+      0% { opacity: 0; transform: scale(0.96); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-card h2 {
+      font-size: 22px;
+      color: #0B3B3F;
+      margin-bottom: 8px;
+    }
+
+    .modal-card p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .modal-field {
+      margin-bottom: 18px;
+    }
+
+    .modal-field label {
+      display: block;
+      font-weight: 600;
+      color: #1A6B6F;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .modal-field input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 40px;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    .modal-field input:focus {
+      outline: none;
+      border-color: #D9A13B;
+      box-shadow: 0 0 0 3px rgba(217, 161, 59, 0.2);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+
+    .modal-actions button {
+      padding: 10px 28px;
+      border: none;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .modal-cancel {
+      background: #eee;
+      color: #444;
+    }
+
+    .modal-cancel:hover {
+      background: #ddd;
+    }
+
+    .modal-confirm {
+      background: #1A6B6F;
+      color: white;
+    }
+
+    .modal-confirm:hover {
+      background: #0B4B4F;
+      transform: scale(1.02);
+    }
+
+    @media (max-width: 768px) {
+      .stats-bar {
+        flex-direction: column;
+      }
+      .action-buttons {
+        flex-direction: column;
+      }
+      td, th {
+        font-size: 12px;
+        padding: 8px;
+      }
+      .header h1 {
+        font-size: 18px;
+      }
+      .action-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .action-btn {
+        justify-content: center;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <img src="favicon1.png" alt="PAT&CHLOE Logo" style="height: 60px; width: auto; border-radius: 15px; background: white; padding: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                    <div>
-                        <h1>PAT&CHLOE INVENTORY MANAGEMENT SYSTEM 
-                            <span class="live-badge">🔴 LIVE SYNC</span>
-                        </h1>
-                        <p>Real-time Stock Tracking </p>
-                    </div>
-                </div>
-            </div>
+  <div class="container">
+    <!-- header -->
+    <div class="header">
+      <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <img src="favicon1.png" alt="PAT&CHLOE Logo" style="height: 60px; width: auto; border-radius: 15px; background: white; padding: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+          <div>
+            <h1>PAT&CHLOE INVENTORY 
+              <span class="live-badge">🔴 LIVE SYNC</span>
+            </h1>
+            <p>Real-time Stock Tracking · Add products easily</p>
+          </div>
         </div>
-
-        <div class="stats-bar">
-            <div class="stat-card">
-                <h3>Total Products</h3>
-                <div class="number" id="totalProducts">0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Total Units in Stock</h3>
-                <div class="number" id="totalUnits">0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Low Stock Items (≤5)</h3>
-                <div class="number" id="lowStockCount">0</div>
-            </div>
-            <div class="stat-card">
-                <h3>Out of Stock</h3>
-                <div class="number" id="outOfStockCount">0</div>
-            </div>
-        </div>
-
-        <div class="search-section">
-            <div class="search-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-bar" placeholder="Search products by name...">
-                <button id="clearSearchBtn" class="search-clear" title="Clear search">✖</button>
-            </div>
-            <div id="searchInfo" class="search-info">
-                <span id="searchResultCount"></span>
-                <button id="clearSearchLink" style="background: none; border: none; color: #D9A13B; cursor: pointer; font-size: 12px;">Clear search</button>
-            </div>
-        </div>
-
-        <div class="action-toolbar">
-            <button class="action-btn export-btn" id="exportBtn">📎 Export to CSV</button>
-            <button class="action-btn reset-btn" id="resetBtn">⟳ Reset to Original</button>
-        </div>
-
-        <div class="table-wrapper">
-            <table id="inventoryTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Product Name</th>
-                        <th>Current Stock</th>
-                        <th>Status</th>
-                        <th>Minus Qty</th>
-                        <th>Plus Qty</th>
-                        <th>Actions</th>
-                        <th>Last Updated</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                </tbody>
-            </table>
-        </div>
-
-        <div class="footer-note">
-            PAT&CHLOE · Beauty and Wellness Products Shop
-        </div>
+      </div>
     </div>
 
-    <div id="toastMsg" class="toast-notification"></div>
+    <!-- stats -->
+    <div class="stats-bar">
+      <div class="stat-card"><h3>Total Products</h3><div class="number" id="totalProducts">0</div></div>
+      <div class="stat-card"><h3>Total Units in Stock</h3><div class="number" id="totalUnits">0</div></div>
+      <div class="stat-card"><h3>Low Stock Items (≤5)</h3><div class="number" id="lowStockCount">0</div></div>
+      <div class="stat-card"><h3>Out of Stock</h3><div class="number" id="outOfStockCount">0</div></div>
+    </div>
 
-    <!-- Firebase SDK (using compat version for easier integration) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <!-- search -->
+    <div class="search-section">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search products by name...">
+        <button id="clearSearchBtn" class="search-clear" title="Clear search">✖</button>
+      </div>
+      <div id="searchInfo" class="search-info">
+        <span id="searchResultCount"></span>
+        <button id="clearSearchLink" style="background: none; border: none; color: #D9A13B; cursor: pointer; font-size: 12px;">Clear search</button>
+      </div>
+    </div>
 
-    <script>
-        // ========== YOUR FIREBASE CONFIGURATION ==========
-        const firebaseConfig = {
-            apiKey: "AIzaSyD0LX-tgqohpJHZyoHmpmCh7-qfBYx-kXk",
-            authDomain: "pat-chloe-inventory.firebaseapp.com",
-            projectId: "pat-chloe-inventory",
-            storageBucket: "pat-chloe-inventory.firebasestorage.app",
-            messagingSenderId: "163010057354",
-            appId: "1:163010057354:web:ead356b829b43017db8973",
-            measurementId: "G-D1TBEXY67V"
+    <!-- toolbar: export, reset, ADD -->
+    <div class="action-toolbar">
+      <button class="action-btn add-btn" id="openAddModalBtn">➕ Add Product</button>
+      <button class="action-btn export-btn" id="exportBtn">📎 Export CSV</button>
+      <button class="action-btn reset-btn" id="resetBtn">⟳ Reset to Original</button>
+    </div>
+
+    <!-- table -->
+    <div class="table-wrapper">
+      <table id="inventoryTable">
+        <thead>
+          <tr><th>#</th><th>Product Name</th><th>Current Stock</th><th>Status</th><th>Minus Qty</th><th>Plus Qty</th><th>Actions</th><th>Last Updated</th></tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="footer-note">PAT&CHLOE · Beauty and Wellness Products Shop</div>
+  </div>
+
+  <!-- add product modal -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal-card">
+      <h2>➕ Add new product</h2>
+      <p>Enter product name and initial stock. It will be saved to the cloud.</p>
+      <div class="modal-field">
+        <label>Product name</label>
+        <input type="text" id="newProductName" placeholder="e.g. Jar - Matcha Latte" />
+      </div>
+      <div class="modal-field">
+        <label>Initial stock</label>
+        <input type="number" id="newProductStock" placeholder="0" min="0" value="0" />
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="closeModalBtn">Cancel</button>
+        <button class="modal-confirm" id="confirmAddBtn">Add product</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastMsg" class="toast-notification"></div>
+
+  <!-- Firebase compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <script>
+    // ========== FIREBASE CONFIG ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0LX-tgqohpJHZyoHmpmCh7-qfBYx-kXk",
+      authDomain: "pat-chloe-inventory.firebaseapp.com",
+      projectId: "pat-chloe-inventory",
+      storageBucket: "pat-chloe-inventory.firebasestorage.app",
+      messagingSenderId: "163010057354",
+      appId: "1:163010057354:web:ead356b829b43017db8973",
+      measurementId: "G-D1TBEXY67V"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // ========== MASTER INVENTORY ==========
+    const MASTER_INVENTORY = [
+      { id: 1, name: "Jar - Caffee Decaf", stock: 36 },
+      { id: 2, name: "Jar - Caffee Macchiato", stock: 63 },
+      { id: 3, name: "Jar - Caffee Black", stock: 15 },
+      { id: 4, name: "Jar - Matcha Detox", stock: 20 },
+      { id: 5, name: "Jar - Avocado", stock: 20 },
+      { id: 6, name: "Jar - Cantaloupe Melon", stock: 31 },
+      { id: 7, name: "Jar - Lychee", stock: 23 },
+      { id: 8, name: "Jar - Dark Choco", stock: 32 },
+      { id: 9, name: "Jar - 4Seasons", stock: 37 },
+      { id: 10, name: "Jar - Cucumber & Dalandan", stock: 22 },
+      { id: 11, name: "Jar - Blueberry", stock: 17 },
+      { id: 12, name: "Jar - Turmeric", stock: 5 },
+      { id: 13, name: "Box - Promeal Taro", stock: 0 },
+      { id: 14, name: "Box - Turmeric", stock: 11 },
+      { id: 15, name: "Pouch - Caffee Decaf", stock: 29 },
+      { id: 16, name: "Pouch - Caffee Macchiato", stock: 100 },
+      { id: 17, name: "Pouch - Caffee Black", stock: 30 },
+      { id: 18, name: "Pouch - Matcha Detox", stock: 36 },
+      { id: 19, name: "Pouch - Avocado", stock: 43 },
+      { id: 20, name: "Pouch - Cantaloupe Melon", stock: 18 },
+      { id: 21, name: "Pouch - Lychee", stock: 0 },
+      { id: 22, name: "Pouch - Dark Choco", stock: 38 },
+      { id: 23, name: "Pouch - 4Seasons", stock: 31 },
+      { id: 24, name: "Pouch - Cucumber & Dalandan", stock: 29 },
+      { id: 25, name: "Pouch - Blueberry", stock: 34 },
+      { id: 26, name: "Kilo - Macchiato", stock: 2 },
+      { id: 27, name: "Ecran", stock: 0 },
+      { id: 28, name: "Konjac Sauce", stock: 0 },
+      { id: 29, name: "Konjac Zero Shirataki Rice 1kilo", stock: 2 },
+      { id: 30, name: "Konjac Zero Shirataki 500g", stock: 11 },
+      { id: 31, name: "Beauty Talks", stock: 11 },
+      { id: 32, name: "Booster C", stock: 8 },
+      { id: 33, name: "Tinted Sunscreen", stock: 19 },
+      { id: 34, name: "Kilo - Decaf Macchiato", stock: 2 },
+      { id: 35, name: "Anna e", stock: 10 }
+    ];
+
+    // ========== STATE ==========
+    let inventory = [];
+    let tempMinus = {};
+    let tempPlus = {};
+    let isUpdatingFromFirebase = false;
+    let nextId = 36; // start after master
+
+    // ========== HELPERS ==========
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toastMsg');
+      t.textContent = msg;
+      t.style.background = isError ? '#E27C2C' : '#1A6B6F';
+      t.style.opacity = '1';
+      clearTimeout(t._hide);
+      t._hide = setTimeout(() => t.style.opacity = '0', 2800);
+    }
+
+    function getStockStatus(stock) {
+      if (stock <= 0) return { text: "OUT OF STOCK", class: "stock-low" };
+      if (stock <= 5) return { text: "CRITICAL LOW", class: "stock-low" };
+      if (stock <= 15) return { text: "LOW STOCK", class: "stock-medium" };
+      return { text: "GOOD", class: "stock-good" };
+    }
+
+    function formatDate() { return new Date().toLocaleString(); }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+
+    // ========== FIREBASE SAVE ==========
+    function saveToFirebase() {
+      if (isUpdatingFromFirebase) return;
+      const data = {};
+      inventory.forEach(item => {
+        data[item.id] = {
+          id: item.id,
+          name: item.name,
+          stock: item.stock,
+          lastUpdated: item.lastUpdated || null
         };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // ========== END FIREBASE CONFIG ==========
+      });
+      database.ref('inventory').set(data).catch(err => {
+        console.error('save error', err);
+        showToast('Error saving to cloud', true);
+      });
+    }
 
-        // Master inventory data
-        const MASTER_INVENTORY = [
-            { id: 1, name: "Jar - Caffee Decaf", stock: 36 },
-            { id: 2, name: "Jar - Caffee Macchiato", stock: 63 },
-            { id: 3, name: "Jar - Caffee Black", stock: 15 },
-            { id: 4, name: "Jar - Matcha Detox", stock: 20 },
-            { id: 5, name: "Jar - Avocado", stock: 20 },
-            { id: 6, name: "Jar - Cantaloupe Melon", stock: 31 },
-            { id: 7, name: "Jar - Lychee", stock: 23 },
-            { id: 8, name: "Jar - Dark Choco", stock: 32 },
-            { id: 9, name: "Jar - 4Seasons", stock: 37 },
-            { id: 10, name: "Jar - Cucumber & Dalandan", stock: 22 },
-            { id: 11, name: "Jar - Blueberry", stock: 17 },
-            { id: 12, name: "Jar - Turmeric", stock: 5 },
-            { id: 13, name: "Box - Promeal Taro", stock: 0 },
-            { id: 14, name: "Box - Turmeric", stock: 11 },
-            { id: 15, name: "Pouch - Caffee Decaf", stock: 29 },
-            { id: 16, name: "Pouch - Caffee Macchiato", stock: 100 },
-            { id: 17, name: "Pouch - Caffee Black", stock: 30 },
-            { id: 18, name: "Pouch - Matcha Detox", stock: 36 },
-            { id: 19, name: "Pouch - Avocado", stock: 43 },
-            { id: 20, name: "Pouch - Cantaloupe Melon", stock: 18 },
-            { id: 21, name: "Pouch - Lychee", stock: 0 },
-            { id: 22, name: "Pouch - Dark Choco", stock: 38 },
-            { id: 23, name: "Pouch - 4Seasons", stock: 31 },
-            { id: 24, name: "Pouch - Cucumber & Dalandan", stock: 29 },
-            { id: 25, name: "Pouch - Blueberry", stock: 34 },
-            { id: 26, name: "Kilo - Macchiato", stock: 2 },
-            { id: 27, name: "Ecran", stock: 0 },
-            { id: 28, name: "Konjac Sauce", stock: 0 },
-            { id: 29, name: "Konjac Zero Shirataki Rice 1kilo", stock: 2 },
-            { id: 30, name: "Konjac Zero Shirataki 500g", stock: 11 },
-            { id: 31, name: "Beauty Talks", stock: 11 },
-            { id: 32, name: "Booster C", stock: 8 },
-            { id: 33, name: "Tinted Sunscreen", stock: 19 },
-            { id: 34, name: "Kilo - Decaf Macchiato", stock: 2 },
-            { id: 35, name: "Anna e", stock: 10 }
-        ];
+    // ========== ADD PRODUCT ==========
+    function addProduct(name, stock) {
+      const trimmed = name.trim();
+      if (!trimmed) { showToast('Product name cannot be empty', true); return false; }
+      if (inventory.some(p => p.name.toLowerCase() === trimmed.toLowerCase())) {
+        showToast(`Product "${trimmed}" already exists`, true);
+        return false;
+      }
+      const newId = nextId++;
+      const newItem = {
+        id: newId,
+        name: trimmed,
+        stock: Math.max(0, Number(stock) || 0),
+        lastUpdated: formatDate()
+      };
+      inventory.push(newItem);
+      tempMinus[newId] = 0;
+      tempPlus[newId] = 0;
+      renderTable();
+      updateStats();
+      saveToFirebase();
+      showToast(`✅ Added "${newItem.name}" (stock: ${newItem.stock})`);
+      return true;
+    }
 
-        let inventory = [];
-        let tempMinus = {};
-        let tempPlus = {};
-        let isUpdatingFromFirebase = false;
+    // ========== RENDER ==========
+    function renderTable() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      const filtered = searchTerm === '' ? inventory : inventory.filter(item => item.name.toLowerCase().includes(searchTerm));
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
 
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toastMsg');
-            toast.textContent = message;
-            toast.style.background = isError ? '#E27C2C' : '#1A6B6F';
-            toast.style.opacity = '1';
-            setTimeout(() => {
-                toast.style.opacity = '0';
-            }, 2500);
+      filtered.forEach((item, index) => {
+        const status = getStockStatus(item.stock);
+        let statusBg = '';
+        let statusColor = '';
+        if (status.text === "OUT OF STOCK") { statusBg = '#F2EAE0'; statusColor = '#B6723A'; }
+        else if (status.text === "CRITICAL LOW") { statusBg = '#FEE8DE'; statusColor = '#E27C2C'; }
+        else if (status.text === "LOW STOCK") { statusBg = '#FEF0E2'; statusColor = '#D98E2B'; }
+        else { statusBg = '#E6F4F0'; statusColor = '#1A6B6F'; }
+
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td style="font-weight:500;">${index + 1}</td>
+          <td class="product-name">${escapeHtml(item.name)}</td>
+          <td class="stock-qty ${status.class}">${item.stock}</td>
+          <td><span class="status-badge" style="background:${statusBg}; color:${statusColor};">${status.text}</span></td>
+          <td><input type="number" id="minus_${item.id}" class="qty-input" min="0" value="${tempMinus[item.id] || 0}" step="1"></td>
+          <td><input type="number" id="plus_${item.id}" class="qty-input" min="0" value="${tempPlus[item.id] || 0}" step="1"></td>
+          <td class="action-buttons">
+            <button class="btn-minus" onclick="quickMinus(${item.id},1)">-1</button>
+            <button class="btn-minus" onclick="quickMinus(${item.id},5)">-5</button>
+            <button class="btn-plus" onclick="quickPlus(${item.id},1)">+1</button>
+            <button class="btn-plus" onclick="quickPlus(${item.id},5)">+5</button>
+            <button class="btn-update" onclick="updateStock(${item.id})">Apply</button>
+          </td>
+          <td class="timestamp">${item.lastUpdated || 'Not updated yet'}</td>
+        `;
+
+        const mi = document.getElementById(`minus_${item.id}`);
+        const pi = document.getElementById(`plus_${item.id}`);
+        if (mi) mi.onchange = function() { tempMinus[item.id] = parseInt(this.value) || 0; };
+        if (pi) pi.onchange = function() { tempPlus[item.id] = parseInt(this.value) || 0; };
+      });
+
+      // search info
+      const info = document.getElementById('searchInfo');
+      const countSpan = document.getElementById('searchResultCount');
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (searchTerm) {
+        info.style.display = 'flex';
+        countSpan.textContent = `Found ${filtered.length} of ${inventory.length} products`;
+        clearBtn.style.display = 'block';
+      } else {
+        info.style.display = 'none';
+        clearBtn.style.display = 'none';
+      }
+    }
+
+    // ========== UPDATE STOCK ==========
+    window.updateStock = function(id) {
+      const item = inventory.find(i => i.id === id);
+      if (!item) return;
+      const minus = parseInt(tempMinus[id]) || 0;
+      const plus = parseInt(tempPlus[id]) || 0;
+      if (minus > item.stock) {
+        showToast(`Cannot deduct ${minus} from "${item.name}". Only ${item.stock} available!`, true);
+        return;
+      }
+      if (minus === 0 && plus === 0) {
+        showToast(`No changes made to "${item.name}"`, true);
+        return;
+      }
+      item.stock = item.stock - minus + plus;
+      item.lastUpdated = formatDate();
+      tempMinus[id] = 0;
+      tempPlus[id] = 0;
+      renderTable();
+      updateStats();
+      saveToFirebase();
+      showToast(`✓ "${item.name}" updated. New stock: ${item.stock}`);
+    };
+
+    window.quickMinus = function(id, amount) {
+      const item = inventory.find(i => i.id === id);
+      if (!item) return;
+      if (item.stock >= amount) {
+        item.stock -= amount;
+        item.lastUpdated = formatDate();
+        renderTable();
+        updateStats();
+        saveToFirebase();
+        showToast(`✓ Removed ${amount} from "${item.name}". New stock: ${item.stock}`);
+      } else {
+        showToast(`Cannot remove ${amount} from "${item.name}". Only ${item.stock} left!`, true);
+      }
+    };
+
+    window.quickPlus = function(id, amount) {
+      const item = inventory.find(i => i.id === id);
+      if (!item) return;
+      item.stock += amount;
+      item.lastUpdated = formatDate();
+      renderTable();
+      updateStats();
+      saveToFirebase();
+      showToast(`✓ Added ${amount} to "${item.name}". New stock: ${item.stock}`);
+    };
+
+    // ========== STATS ==========
+    function updateStats() {
+      const total = inventory.length;
+      const units = inventory.reduce((s, i) => s + i.stock, 0);
+      const low = inventory.filter(i => i.stock > 0 && i.stock <= 5).length;
+      const out = inventory.filter(i => i.stock === 0).length;
+      document.getElementById('totalProducts').textContent = total;
+      document.getElementById('totalUnits').textContent = units;
+      document.getElementById('lowStockCount').textContent = low;
+      document.getElementById('outOfStockCount').textContent = out;
+    }
+
+    // ========== EXPORT / RESET ==========
+    function exportToCSV() {
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0,19).replace(/:/g, '-');
+      let rows = [['"Product Name"','"Current Stock"','"Status"','"Last Updated"']];
+      inventory.forEach(item => {
+        const status = getStockStatus(item.stock).text;
+        rows.push([
+          `"${item.name.replace(/"/g,'""')}"`,
+          item.stock,
+          `"${status}"`,
+          `"${item.lastUpdated || 'Not updated'}"`
+        ]);
+      });
+      const csv = rows.map(r => r.join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `pat_chloe_inventory_${dateStr}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+      showToast(`✓ Exported ${inventory.length} products`);
+    }
+
+    function resetToOriginal() {
+      if (!confirm('⚠️ Reset ALL inventory to original stocks? This will undo all changes.')) return;
+      const resetData = {};
+      MASTER_INVENTORY.forEach(item => {
+        resetData[item.id] = { id: item.id, name: item.name, stock: item.stock, lastUpdated: null };
+      });
+      // keep any extra products? we reset to master only (remove added)
+      database.ref('inventory').set(resetData).then(() => {
+        showToast('✓ Inventory reset to original');
+      }).catch(err => showToast('Reset error', true));
+    }
+
+    // ========== FIREBASE LISTENER ==========
+    function listenForInventoryUpdates() {
+      database.ref('inventory').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+        isUpdatingFromFirebase = true;
+        const arr = Object.values(data);
+        arr.sort((a,b) => a.id - b.id);
+        inventory = arr;
+        // update nextId
+        let max = 0;
+        arr.forEach(i => { if (i.id > max) max = i.id; });
+        nextId = max + 1;
+        // reset temp
+        tempMinus = {};
+        tempPlus = {};
+        inventory.forEach(i => { tempMinus[i.id] = 0; tempPlus[i.id] = 0; });
+        renderTable();
+        updateStats();
+        isUpdatingFromFirebase = false;
+      }, (err) => {
+        console.error('listen error', err);
+        showToast('Connection error', true);
+      });
+    }
+
+    // ========== INIT ==========
+    function initializeApp() {
+      const ref = database.ref('inventory');
+      ref.once('value', (snap) => {
+        if (!snap.exists()) {
+          const init = {};
+          MASTER_INVENTORY.forEach(item => {
+            init[item.id] = { id: item.id, name: item.name, stock: item.stock, lastUpdated: null };
+          });
+          ref.set(init).then(() => {
+            showToast('🟢 Cloud ready');
+          });
+        } else {
+          showToast('🟢 Connected to cloud');
         }
+      });
+      listenForInventoryUpdates();
+    }
 
-        function getStockStatus(stock) {
-            if (stock <= 0) return { text: "OUT OF STOCK", class: "stock-low" };
-            if (stock <= 5) return { text: "CRITICAL LOW", class: "stock-low" };
-            if (stock <= 15) return { text: "LOW STOCK", class: "stock-medium" };
-            return { text: "GOOD", class: "stock-good" };
-        }
+    // ========== MODAL CONTROLS ==========
+    const modal = document.getElementById('addModal');
+    const openBtn = document.getElementById('openAddModalBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const confirmBtn = document.getElementById('confirmAddBtn');
+    const nameInput = document.getElementById('newProductName');
+    const stockInput = document.getElementById('newProductStock');
 
-        function formatDate() {
-            return new Date().toLocaleString();
-        }
+    function openModal() { modal.classList.add('active'); nameInput.value = ''; stockInput.value = '0'; nameInput.focus(); }
+    function closeModal() { modal.classList.remove('active'); }
 
-        // Save to Firebase
-        function saveToFirebase() {
-            if (isUpdatingFromFirebase) return;
-            
-            const dataToSave = {};
-            inventory.forEach(item => {
-                dataToSave[item.id] = {
-                    id: item.id,
-                    name: item.name,
-                    stock: item.stock,
-                    lastUpdated: item.lastUpdated || null
-                };
-            });
-            
-            database.ref('inventory').set(dataToSave).catch(error => {
-                console.error('Firebase save error:', error);
-                showToast('Error saving to cloud', true);
-            });
-        }
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-        function updateStock(id) {
-            const item = inventory.find(i => i.id === id);
-            if (!item) return;
+    confirmBtn.addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      const stock = parseInt(stockInput.value) || 0;
+      if (addProduct(name, stock)) {
+        closeModal();
+      }
+    });
 
-            const minusQty = parseInt(tempMinus[id]) || 0;
-            const plusQty = parseInt(tempPlus[id]) || 0;
+    // Enter key in modal
+    nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmBtn.click(); });
+    stockInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmBtn.click(); });
 
-            if (minusQty > item.stock) {
-                showToast(`Cannot deduct ${minusQty} from "${item.name}". Only ${item.stock} available!`, true);
-                return;
-            }
+    // ========== OTHER EVENTS ==========
+    document.getElementById('searchInput').addEventListener('input', renderTable);
+    document.getElementById('clearSearchBtn').addEventListener('click', function() {
+      document.getElementById('searchInput').value = '';
+      renderTable();
+    });
+    document.getElementById('clearSearchLink').addEventListener('click', function() {
+      document.getElementById('searchInput').value = '';
+      renderTable();
+    });
+    document.getElementById('exportBtn').addEventListener('click', exportToCSV);
+    document.getElementById('resetBtn').addEventListener('click', resetToOriginal);
 
-            if (minusQty === 0 && plusQty === 0) {
-                showToast(`No changes made to "${item.name}"`, true);
-                return;
-            }
-
-            const newStock = item.stock - minusQty + plusQty;
-            item.stock = newStock;
-            item.lastUpdated = formatDate();
-
-            tempMinus[id] = 0;
-            tempPlus[id] = 0;
-
-            renderTable();
-            updateStats();
-            saveToFirebase();
-            showToast(`✓ "${item.name}" updated. New stock: ${newStock}`);
-        }
-
-        function quickMinus(id, amount) {
-            const item = inventory.find(i => i.id === id);
-            if (item.stock >= amount) {
-                item.stock -= amount;
-                item.lastUpdated = formatDate();
-                renderTable();
-                updateStats();
-                saveToFirebase();
-                showToast(`✓ Removed ${amount} from "${item.name}". New stock: ${item.stock}`);
-            } else {
-                showToast(`Cannot remove ${amount} from "${item.name}". Only ${item.stock} left!`, true);
-            }
-        }
-
-        function quickPlus(id, amount) {
-            const item = inventory.find(i => i.id === id);
-            item.stock += amount;
-            item.lastUpdated = formatDate();
-            renderTable();
-            updateStats();
-            saveToFirebase();
-            showToast(`✓ Added ${amount} to "${item.name}". New stock: ${item.stock}`);
-        }
-
-        function updateStats() {
-            const totalProducts = inventory.length;
-            const totalUnits = inventory.reduce((sum, item) => sum + item.stock, 0);
-            const lowStockCount = inventory.filter(item => item.stock > 0 && item.stock <= 5).length;
-            const outOfStockCount = inventory.filter(item => item.stock === 0).length;
-
-            document.getElementById('totalProducts').textContent = totalProducts;
-            document.getElementById('totalUnits').textContent = totalUnits;
-            document.getElementById('lowStockCount').textContent = lowStockCount;
-            document.getElementById('outOfStockCount').textContent = outOfStockCount;
-        }
-
-        function updateSearchInfo(filteredCount, totalCount, searchTerm) {
-            const searchInfo = document.getElementById('searchInfo');
-            const resultCountSpan = document.getElementById('searchResultCount');
-            const clearBtn = document.getElementById('clearSearchBtn');
-            
-            if (searchTerm && searchTerm.trim() !== '') {
-                searchInfo.style.display = 'flex';
-                resultCountSpan.textContent = `Found ${filteredCount} of ${totalCount} products`;
-                clearBtn.style.display = 'block';
-            } else {
-                searchInfo.style.display = 'none';
-                clearBtn.style.display = 'none';
-            }
-        }
-
-        function clearSearch() {
-            const searchInput = document.getElementById('searchInput');
-            searchInput.value = '';
-            renderTable();
-            searchInput.focus();
-        }
-
-        function renderTable() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-            const filtered = searchTerm === '' 
-                ? inventory 
-                : inventory.filter(item => item.name.toLowerCase().includes(searchTerm));
-
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-
-            filtered.forEach((item, index) => {
-                const status = getStockStatus(item.stock);
-                
-                let statusBg = '';
-                let statusColor = '';
-                if (status.text === "OUT OF STOCK") {
-                    statusBg = '#F2EAE0';
-                    statusColor = '#B6723A';
-                } else if (status.text === "CRITICAL LOW") {
-                    statusBg = '#FEE8DE';
-                    statusColor = '#E27C2C';
-                } else if (status.text === "LOW STOCK") {
-                    statusBg = '#FEF0E2';
-                    statusColor = '#D98E2B';
-                } else {
-                    statusBg = '#E6F4F0';
-                    statusColor = '#1A6B6F';
-                }
-
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td style="font-weight: 500;">${index + 1}</td>
-                    <td class="product-name">${escapeHtml(item.name)}</td>
-                    <td class="stock-qty ${status.class}">${item.stock}</td>
-                    <td><span class="status-badge" style="background: ${statusBg}; color: ${statusColor};">${status.text}</span></td>
-                    <td><input type="number" id="minus_${item.id}" class="qty-input" min="0" value="${tempMinus[item.id] || 0}" step="1"></td>
-                    <td><input type="number" id="plus_${item.id}" class="qty-input" min="0" value="${tempPlus[item.id] || 0}" step="1"></td>
-                    <td class="action-buttons">
-                        <button class="btn-minus" onclick="quickMinus(${item.id}, 1)">-1</button>
-                        <button class="btn-minus" onclick="quickMinus(${item.id}, 5)">-5</button>
-                        <button class="btn-plus" onclick="quickPlus(${item.id}, 1)">+1</button>
-                        <button class="btn-plus" onclick="quickPlus(${item.id}, 5)">+5</button>
-                        <button class="btn-update" onclick="updateStock(${item.id})">Apply</button>
-                    </td>
-                    <td class="timestamp">${item.lastUpdated || 'Not updated yet'}</td>
-                `;
-
-                const minusInput = document.getElementById(`minus_${item.id}`);
-                const plusInput = document.getElementById(`plus_${item.id}`);
-                if (minusInput) {
-                    minusInput.onchange = function() { tempMinus[item.id] = parseInt(this.value) || 0; };
-                }
-                if (plusInput) {
-                    plusInput.onchange = function() { tempPlus[item.id] = parseInt(this.value) || 0; };
-                }
-            });
-
-            updateSearchInfo(filtered.length, inventory.length, searchTerm);
-        }
-
-        function escapeHtml(str) {
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        function resetToOriginal() {
-            if (confirm('⚠️ Are you sure you want to reset ALL inventory to original stocks?\nThis will undo all changes made by ALL users!')) {
-                const resetInventory = {};
-                MASTER_INVENTORY.forEach(item => {
-                    resetInventory[item.id] = {
-                        id: item.id,
-                        name: item.name,
-                        stock: item.stock,
-                        lastUpdated: null
-                    };
-                });
-                
-                database.ref('inventory').set(resetInventory).then(() => {
-                    showToast('✓ Inventory has been reset to original stocks');
-                }).catch(error => {
-                    showToast('Error resetting inventory', true);
-                });
-            }
-        }
-
-        function exportToCSV() {
-            const now = new Date();
-            const dateStr = now.toISOString().slice(0, 19).replace(/:/g, '-');
-            
-            let csvRows = [
-                ['"Product Name"', '"Current Stock"', '"Status"', '"Last Updated"']
-            ];
-            
-            inventory.forEach(item => {
-                const status = getStockStatus(item.stock).text;
-                csvRows.push([
-                    `"${item.name.replace(/"/g, '""')}"`,
-                    item.stock,
-                    `"${status}"`,
-                    `"${item.lastUpdated || 'Not updated'}"`
-                ]);
-            });
-            
-            const csvContent = csvRows.map(row => row.join(',')).join('\n');
-            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.href = url;
-            link.setAttribute('download', `pat_chloe_inventory_${dateStr}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            showToast(`✓ Exported ${inventory.length} products to CSV`);
-        }
-
-        // Listen for real-time updates from Firebase
-        function listenForInventoryUpdates() {
-            const inventoryRef = database.ref('inventory');
-            
-            inventoryRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                
-                if (data) {
-                    isUpdatingFromFirebase = true;
-                    
-                    // Convert Firebase object back to array
-                    const newInventory = Object.values(data);
-                    newInventory.sort((a, b) => a.id - b.id);
-                    
-                    inventory = newInventory;
-                    tempMinus = {};
-                    tempPlus = {};
-                    inventory.forEach(item => {
-                        tempMinus[item.id] = 0;
-                        tempPlus[item.id] = 0;
-                    });
-                    
-                    renderTable();
-                    updateStats();
-                    isUpdatingFromFirebase = false;
-                    
-                    console.log('🔄 Real-time update received from Firebase');
-                }
-            }, (error) => {
-                console.error('Firebase listen error:', error);
-                showToast('Connection error - check your internet', true);
-            });
-        }
-
-        // Initialize the app
-        function initializeApp() {
-            const inventoryRef = database.ref('inventory');
-            
-            inventoryRef.once('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    // First time - upload master inventory to Firebase
-                    console.log('First time setup - uploading master inventory to Firebase');
-                    const initialData = {};
-                    MASTER_INVENTORY.forEach(item => {
-                        initialData[item.id] = {
-                            id: item.id,
-                            name: item.name,
-                            stock: item.stock,
-                            lastUpdated: null
-                        };
-                    });
-                    inventoryRef.set(initialData).then(() => {
-                        console.log('✅ Master inventory uploaded to Firebase');
-                        showToast('🟢 Connected to cloud - Live sync enabled', false);
-                    });
-                } else {
-                    showToast('🟢 Connected to cloud - Live sync enabled', false);
-                }
-            });
-            
-            // Start listening for real-time updates
-            listenForInventoryUpdates();
-        }
-
-        // Event listeners
-        document.getElementById('searchInput').addEventListener('input', renderTable);
-        document.getElementById('clearSearchBtn').addEventListener('click', clearSearch);
-        document.getElementById('clearSearchLink')?.addEventListener('click', clearSearch);
-        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
-        document.getElementById('resetBtn').addEventListener('click', resetToOriginal);
-
-        // Start the app
-        initializeApp();
-    </script>
+    // ========== START ==========
+    initializeApp();
+  </script>
 </body>
 </html>
